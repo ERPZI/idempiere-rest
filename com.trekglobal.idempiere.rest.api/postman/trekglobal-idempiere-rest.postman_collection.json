@@ -187,7 +187,8 @@
 							"pm.environment.set(\"authToken\", jsonData.token);",
 							"pm.environment.set(\"refreshToken\", jsonData.refresh_token);"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -207,7 +208,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"refresh_token\": \"{{refreshToken}}\"\n}"
+					"raw": "{\n    \"refresh_token\": \"{{refreshToken}}\",\n    \"clientId\": {{clientId}},\n    \"userId\": 101\n}"
 				},
 				"url": {
 					"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/auth/refresh",
@@ -574,6 +575,55 @@
 					]
 				},
 				"description": "Get records for table with optional filter, orderBy and pageNo parameter. Default page size is 100."
+			},
+			"response": []
+		},
+				{
+			"name": "api/v1/models/{table name}",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/models/c_tax?$filter=Name in ('106','PST','Exempt') AND C_Tax_ID in (106,107)&$select=Name",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"models",
+						"c_tax"
+					],
+					"query": [
+						{
+							"key": "$filter",
+							"value": "Name in ('106','PST','Exempt') AND C_Tax_ID in (106,107)"
+						},
+						{
+							"key": "$select",
+							"value": "Name"
+						}
+					]
+				},
+				"description": "Get records for table with optional filter using in operator"
 			},
 			"response": []
 		},
@@ -2117,10 +2167,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"C_BPartner_ID\": \"117,114\",\n\t\"report-type\" : \"HTML\"\n}"
+					"raw": "{\n\t\"C_BPartner_ID\": \"117,114\",\n\t\"DateOrdered\": \"2022-01-01\",\n\t\"DateOrdered_to\": \"2022-12-31\",\n\t\"report-type\" : \"HTML\"\n}"
 				},
 				"url": {
-					"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/processes/rv_bpartneropen",
+					"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/processes/rv_orderdetail",
 					"protocol": "{{protocol}}",
 					"host": [
 						"{{host}}"
@@ -2130,7 +2180,7 @@
 						"api",
 						"v1",
 						"processes",
-						"rv_bpartneropen"
+						"rv_orderdetail"
 					]
 				},
 				"description": "Run process"
@@ -2138,7 +2188,7 @@
 			"response": []
 		},
 		{
-			"name": "api/v1/files/{file name}?length={file size}",
+			"name": "api/v1/files?fileName={file name}&length={file size}",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -2159,7 +2209,7 @@
 					}
 				],
 				"url": {
-					"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/files/{{processFileName}}?length={{processFileLength}}&nodeId={{processNodeId}}",
+					"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/files?fileName={{logFileName}}&length={{logFileLength}}",
 					"protocol": "{{protocol}}",
 					"host": [
 						"{{host}}"
@@ -2168,17 +2218,16 @@
 					"path": [
 						"api",
 						"v1",
-						"files",
-						"{{processFileName}}"
+						"files"
 					],
 					"query": [
 						{
-							"key": "length",
-							"value": "{{processFileLength}}"
+							"key": "fileName",
+							"value": "{{logFileName}}"
 						},
 						{
-							"key": "nodeId",
-							"value": "{{processNodeId}}"
+							"key": "length",
+							"value": "{{logFileLength}}"
 						}
 					]
 				},
@@ -2732,7 +2781,7 @@
 			"response": []
 		},
 		{
-			"name": "api/v1/nodes/{id}/logs/{fileName}",
+			"name": "api/v1/nodes/{id}/logs/file",
 			"request": {
 				"method": "GET",
 				"header": [
@@ -2754,7 +2803,7 @@
 					}
 				],
 				"url": {
-					"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/nodes/{{nodeId}}/logs/{{logFileName}}",
+					"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/nodes/{{nodeId}}/logs/file?fileName={{logFileName}}",
 					"protocol": "{{protocol}}",
 					"host": [
 						"{{host}}"
@@ -2766,7 +2815,13 @@
 						"nodes",
 						"{{nodeId}}",
 						"logs",
-						"{{logFileName}}"
+						"file"
+					],
+					"query": [
+						{
+							"key": "fileName",
+							"value": "{{logFileName}}"
+						}
 					]
 				}
 			},
@@ -4007,6 +4062,311 @@
 					]
 				},
 				"description": "set user choice in a node by id"
+			},
+			"response": []
+		},
+		{
+			"name": "api/v1/statuslines",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/statuslines?$filter=EntityType neq 'D'&with_messages=true",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"statuslines"
+					],
+					"query": [
+						{
+							"key": "$filter",
+							"value": "EntityType neq 'D'"
+						},
+						{
+							"key": "with_messages",
+							"value": "true"
+						}
+					]
+				},
+				"description": "Get list of status lines"
+			},
+			"response": []
+		},
+		{
+			"name": "api/v1/statuslines/{statuslineid}",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/statuslines/200024",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"statuslines",
+						"200024"
+					]
+				},
+				"description": "Get message of a status line"
+			},
+			"response": []
+		},
+		{
+			"name": "api/v1/charts/{id}",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/charts/50002?width=800&height=600",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"charts",
+						"50002"
+					],
+					"query": [
+						{
+							"key": "width",
+							"value": "800"
+						},
+						{
+							"key": "height",
+							"value": "600"
+						}
+					]
+				},
+				"description": "Get chart Sales YTD with size 800x600"
+			},
+			"response": []
+		},
+		{
+			"name": "api/v1/charts/{id}/data",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/charts/50002/data",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"charts",
+						"50002",
+						"data"
+					]
+				},
+				"description": "Get data from chart 50002"
+			},
+			"response": []
+		},
+				{
+			"name": "api/v1/charts/data?$filter={where clause}",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/charts/data?$filter=AD_Chart_ID eq 50000 OR AD_Chart_ID eq 50001",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"charts",
+						"data"
+					],
+					"query": [
+						{
+							"key": "$filter",
+							"value": "AD_Chart_ID eq 50000 OR AD_Chart_ID eq 50001"
+						}
+					]
+				},
+				"description": "Get data from charts filtered by id"
+			},
+			"response": []
+		},
+		{
+			"name": "api/v1/menutree/{id}",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/menutree/10",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"menutree",
+						"10"
+					]
+				},
+				"description": "Get menu tree for an Id."
+			},
+			"response": []
+		},
+		{
+			"name": "api/v1/models/{tableName}?locale={locale}",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{authToken}}"
+					}
+				],
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/models/{{tableName}}?locale={{locale}}",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"v1",
+						"models",
+						"{{tableName}}"
+					],
+					"query": [
+						{
+							"key": "locale",
+							"value": "{{locale}}"
+						}
+					]
+				},
+				"description": "Get models with locale query parameter."
 			},
 			"response": []
 		}
